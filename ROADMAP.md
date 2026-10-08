@@ -431,15 +431,14 @@ There are two doors and they are not interchangeable.
 A separate form, at `clau.de/desktop-extention-submission`. **No Team or
 Enterprise organization required.**
 
-- [ ] A working `.mcpb` (v0.4)
+- [x] A working `.mcpb` (v0.4) — attached to every release since 10 August
 - [x] Annotations on all three tools (v0.2)
 - [x] **Privacy policy** — a "Privacy Policy" section in the README, already
       written: collection, use, storage, third parties, retention and contact.
-      Still missing the `privacy_policies` array in `manifest.json`, which only
-      exists once the `.mcpb` is built.
+      The `privacy_policies` array is in `ts/manifest.json` too.
       *"Missing or incomplete privacy policies result in immediate rejection."*
-- [ ] 512×512 PNG icon
-- [ ] Installation and usage documentation
+- [x] 512×512 PNG icon (`ts/icon.png`, in the bundle)
+- [x] Installation and usage documentation (README, in four languages)
 - [ ] Examples exercising each tool (the sandbox gives these for free)
 
 ### Door B — Remote connector · **closed for now**
@@ -2546,7 +2545,8 @@ instead.
 
 **Not verified: a real deployment, a real Oura login, and claude.ai or ChatGPT
 completing the connection.** The branch ships as a PR, not a release, until
-Oscar has done it once.
+Oscar has done it once. *(8 October: it was merged and released in 0.4.0,
+marked experimental in the README; the real deployment is still pending.)*
 
 ---
 
