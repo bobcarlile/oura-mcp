@@ -12,6 +12,8 @@ asks for is below, ready to paste.
 
 **Privacy policy:** <https://github.com/proscar87/oura-mcp#privacy-policy>
 
+**Examples, one per tool:** <https://github.com/proscar87/oura-mcp#examples>
+
 **Short description**
 
 > The Oura Ring v2 API as an MCP server. All 19 collections, six tools, and it
