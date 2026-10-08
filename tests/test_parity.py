@@ -11,12 +11,15 @@ Most of them were found by hand. These are the comparisons worth keeping.
 
 IT NEVER TOUCHES THE NETWORK. Both sides are handed the same literal data.
 
-It skips itself if Node or the compiled `ts/dist` is missing, because the
-mandatory CI runs Python only and a parity test that fails for lack of a
-toolchain teaches nobody anything.
+It skips itself if Node or the compiled `ts/dist` is missing, because a
+contributor without Node learns nothing from a parity test that fails for lack
+of a toolchain. Except in GitHub Actions: both jobs that run pytest (`ci.yml`
+and `publish.yml`) build `ts/` first, so a missing build there is a broken
+workflow, and skipping is how 0.4.0 shipped with these 24 tests unrun.
 """
 
 import json
+import os
 import pathlib
 import shutil
 import subprocess
@@ -25,6 +28,14 @@ import pytest
 
 ROOT = pathlib.Path(__file__).parent.parent
 DIST = ROOT / "ts" / "dist" / "client.js"
+
+if os.environ.get("GITHUB_ACTIONS") and not (
+    shutil.which("node") and DIST.exists() and DIST.with_name("method.js").exists()
+):
+    raise RuntimeError(
+        "GitHub Actions without node or a compiled ts/dist: the workflow lost its "
+        "`npm ci && npm run build` step, and the parity tests would skip in silence."
+    )
 
 pytestmark = pytest.mark.skipif(
     not (shutil.which("node") and DIST.exists()),
