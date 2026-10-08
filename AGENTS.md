@@ -214,7 +214,7 @@ without saying how much that metric swings on its own is manufacturing a signal.
 Oscar reversed the rule on 23 September 2026, with a condition: an analysis
 tool ships only if the method travels with the number and a simulation holds
 it to its error rate. `oura_compare` was the first to meet it and `oura_relate`
-the second. The rule for any next one — trends are the obvious candidate:
+the second. The rule for any next one:
 
 - It returns the noise band with the difference and defaults to «within noise».
 - It says `cannot_tell` instead of guessing when there are too few days.
@@ -222,7 +222,10 @@ the second. The rule for any next one — trends are the obvious candidate:
   noise, and mutating each part of the method fails a test.
 - Python and TypeScript agree to the last printed digit (`test_parity.py`).
 
-No trends yet, no anomaly detection, no advice. Analysis that needs more than this
+No trend tool: it was measured on 8 October 2026 and declined, because comparing
+the two halves of the window with `oura_compare` catches nearly as much
+(`tools/trend_study.md`, rerun with `tools/trend_study.py`). No anomaly
+detection, no advice. Analysis that needs more than this
 still belongs where the method can be cited — see
 [cotejo](https://github.com/proscar87/cotejo).
 

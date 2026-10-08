@@ -439,7 +439,7 @@ Enterprise organization required.**
       *"Missing or incomplete privacy policies result in immediate rejection."*
 - [x] 512×512 PNG icon (`ts/icon.png`, in the bundle)
 - [x] Installation and usage documentation (README, in four languages)
-- [ ] Examples exercising each tool (the sandbox gives these for free)
+- [x] Examples exercising each tool — README «Examples», run on the sandbox, 8 October
 
 ### Door B — Remote connector · **closed for now**
 
@@ -2720,3 +2720,62 @@ May.
 and distribution is the constraint. The desktop-extension form is still the
 highest-leverage item and still waits on Oscar. Publishing the TS build to npm
 is the second.
+
+---
+
+## Trends, measured and declined — 8 October 2026
+
+Oscar asked for trends on 23 September; the 23 September entry left them
+unbuilt because no slope method had survived the simulations yet. Before
+building one, a narrower question: **does a trend test catch a real, steady
+drift more often than `oura_compare` already does** when the model compares
+the first half of the window with the second? If not, a seventh tool adds a
+tool without adding an answer.
+
+`tools/trend_study.py` answers it with the same null generators as
+`test_compare.py` and `test_relate.py` (AR(1) from ρ=0 to 0.8, 30% missing
+days, two weekday rhythms; 16 scenarios), the real `method.py`, 2,000 null and
+1,000 power runs per cell, seeded. It reproduces to the digit in about 100 s.
+
+**False alarms, worst and best scenario:**
+
+| Days | Naive OLS | HAC (Newey–West) | OLS, effective n | Slope, history variance | Compare halves |
+|---|---|---|---|---|---|
+| 60 | 5–52% | 9–33% | 2.6–5.9% | 2.3–4.9% | 2.1–5.0% |
+| 90 | 5–51% | 7–30% | 2.6–6.0% | 2.8–5.9% | 2.6–6.0% |
+| 180 | 5–52% | 7–26% | 3.3–6.7% | 3.2–7.4% | 2.8–6.4% |
+
+Naive OLS and HAC are out, as the 23 September entry predicted. With a 6%
+ceiling in every scenario, two slope tests survive at 60 days, one at 90, and
+none at 180.
+
+**Power on a steady drift, averaged over the 16 scenarios:**
+
+| Days | Total drift | Best surviving slope test | Compare halves |
+|---|---|---|---|
+| 60 | 1 SD | 24.6% | 19.1% |
+| 60 | 2 SD | 63.3% | 51.0% |
+| 90 | 1 SD | 32.7% | 25.6% |
+| 90 | 2 SD | 75.5% | 65.5% |
+| 180 | 1 SD | — | 45.8% |
+| 180 | 2 SD | — | 86.5% |
+
+**Declined.** The gain is real and small: 4–7 points at 1 SD, 10–12 at 2 SD,
+and only at the lengths where a slope survived. At 180 days, the length of
+«how have the last six months gone», no slope test kept every scenario under
+6%. The halves reached 6.4% there too, though, so that is a slight
+difference, not a clean one. What decided it is the price: a seventh tool, in
+two languages, with parity, mutation tests and four READMEs, for a few points.
+
+**What shipped instead** is one sentence, in the server instructions and in
+`oura_compare`'s description, in both implementations: asked whether a metric
+is trending, compare the two halves of the window. The model gets most of the
+power through a method that already carries its band.
+
+**Worth recording:** `oura_compare` on halves reached 6.4% false alarms in one
+scenario (AR 0.3, 180 days), above the «up to 5.7%» the CHANGELOG quotes from
+its own suite. That is 2,000 runs, a little over one standard error from 5.7%, so it
+is not a regression. It does say the 5.7% is a measurement, not a ceiling.
+
+The study was built by Codex and rerun here independently, with the same
+result to the last digit.
