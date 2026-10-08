@@ -2337,7 +2337,7 @@ the registry API on 10 August 2026:
 | version | server |
 |---------|--------|
 | 1.16.0  | `ai.smithery/eliu243-oura-mcp-server` (listed three times) |
-| 0.6.0   | `ai.foura/mcp` |
+| 0.6.0   | ~~`ai.foura/mcp`~~ — not Oura: web scraping (see 8 October) |
 | 0.4.6   | `io.github.davidmosiah/ouramcp` |
 | 0.4.1   | `io.github.AntVsl/oura-mcp` |
 | 0.3.0   | `io.github.proscar87/oura-mcp` ← this one |
@@ -2345,7 +2345,11 @@ the registry API on 10 August 2026:
 | 0.2.0   | `io.github.jordanburke/oura-ring-mcp-server` |
 | 0.1.4   | `io.github.mitchhankins01/oura-ring-mcp` |
 | 0.1.1   | `link.smirnov/mcp-oura` |
-| 1.0.0   | `com.sendyouragent/readiness` |
+| 1.0.0   | ~~`com.sendyouragent/readiness`~~ — not Oura: website readiness (see 8 October) |
+
+*Corrected 8 October 2026:* two of these rows matched the search on the
+substring and nothing else. The real count that day was eight Oura servers,
+this one included. The conclusion below doesn't move.
 
 Being in the registry sat near the top of the old list. It is **table stakes**:
 everyone is there, several of them for longer and at higher version numbers. A
@@ -2649,3 +2653,70 @@ Still not covered: the token endpoint's actual response format. That needs a
 real grant, which CI will never have — the `extapi:` prefix was only ever in a
 response, never in the spec.
 
+---
+
+## Re-scan — 8 October 2026
+
+**The registry count was wrong from the start.** A `search=oura` on the
+registry matches substrings, and two entries in the 10 August table are not
+Oura at all: `ai.foura/mcp` is a web-scraping service and
+`com.sendyouragent/readiness` scores websites for AI agents. Both are struck
+through above. Today, checking each entry's description rather than its name,
+there are **ten distinct Oura servers**, this one included, plus
+`eliu243-oura-mcp-server` listed under three names. The rest of what the search
+returns (`ourairports`, `authyouragent`, `ownyourai`, …) is noise of the same
+kind.
+
+**Two new ones since 22 September:**
+
+- **`io.usefulapi/oura`** (registry, 29 September). Hosted only, at
+  `oura.usefulapi.io/mcp`: you paste your Oura credentials into their service.
+  Free for 100 tool calls a month, then $9/month. One of hundreds of servers
+  the same account generates from API specs (`codegen.mjs`); the Oura folder
+  holds a README and a `server.json`, no source. The tools are generic
+  (`oura_list_documents`, `oura_get_document`) plus three webhook **write**
+  tools and three billing tools. It answers the same need as our `ts/worker`
+  with the opposite trade: nothing to deploy, but a third party holds the
+  health data and the token. That trade is what the 23 September entry chose
+  not to make.
+- **`osjayaprakash/oura-ring-python-mcp`** (PyPI and registry, created
+  27 September; 176 downloads in its first month). The most careful newcomer
+  so far: OAuth2 only, eleven typed tools, read-only annotations, an
+  inclusive `end_date` (it asks Oura for one more day and trims by `day`),
+  and pagination to the end with a **loud** stop at 50 pages, never a silent
+  cap. Read from the code, not run: it pads only the end of the range, so the
+  `workout` UTC skew measured on 9 August should still cost it an evening
+  workout on the last requested day at negative UTC offsets, and a morning one
+  on the first day at positive offsets. It covers nine day-keyed collections plus heart rate; no
+  `fields`, no `latest`, no analysis, and ranges capped at 90 days.
+
+**One thing to take from it:** it requests the `stress` scope, with the comment
+«Resilience needs `stress`, which Oura's scope list omits». That is the second
+server to say so (22 September noted the first). `SCOPE_OF` still maps
+`daily_stress` and `daily_resilience` to `daily`. Still unverified here, and
+still costs at most a missed diagnosis, but two independent servers making the
+same claim is reason to put it first in line for the day a real grant is
+available.
+
+**Usage, measured today:**
+
+| | 22 Sep | 8 Oct |
+|---|---|---|
+| PyPI `mcp-oura`, last month (mirrors included) | 439 | 745 (156 last week) |
+| `.mcpb` downloads | 2 (0.3.5) | 7 (0.4.0), 11 across releases |
+| GitHub page views, 14 days | 17 uniques | 8 views / 4 uniques |
+| GitHub clones, 14 days | — | 299 / 109 uniques |
+| Stars / forks / outside issues | 0 / 0 / 0 | 0 / 0 / 0 |
+| `@daveremy/oura-mcp` on npm, last month | ~11k | 16,720 |
+
+Clones outnumber visitors by two orders of magnitude, so most of the PyPI number
+is still machines (see 6 September). The gap with `@daveremy` widened, to about
+22×, on a repo with 4 stars — npm is where the volume is, and the TypeScript
+port that would publish there already exists. Stars still track age, not
+quality: `YuzeHao2023/MCP-oura` leads with 116 and has not been pushed since
+May.
+
+**The conclusion from 22 September holds and got sharper:** the code is ahead
+and distribution is the constraint. The desktop-extension form is still the
+highest-leverage item and still waits on Oscar. Publishing the TS build to npm
+is the second.
