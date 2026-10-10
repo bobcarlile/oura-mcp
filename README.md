@@ -280,6 +280,64 @@ between consecutive measurements fall inside the metric's own normal swing, so
 a percentage without that context manufactures a signal rather than reporting
 one. Its one parameter is `days`, from 1 to 30, defaulting to 7.
 
+### Examples
+
+Each one was run against Oura's sample data (`OURA_SANDBOX=1`) on 8 October
+2026. Responses are abridged; every sandbox response also carries `synthetic`,
+saying the numbers aren't yours.
+
+**1. "Is it working?"** → `oura_check`
+
+```json
+{"mode": "sandbox", "data": "synthetic, from Oura, not yours", "oura_responds": true,
+ "unavailable_in_sandbox": ["personal_info"],
+ "next_step": "drop OURA_SANDBOX and set your own credential to see your data"}
+```
+
+**2. "How did I sleep, and how ready am I today?"** → `oura_today`
+
+Last night's `daily_sleep` and today's `daily_readiness`, with the 7 days
+before them, raw. It says so in the response: `"computed": "raw records only:
+this call computed no average, no delta and no trend."`
+
+**3. "What can you see in my Oura data?"** → `oura_collections`
+
+All 19 collections, each with what it carries and its shape:
+`"daily_sleep": {"shape": "date_range", "carries": "sleep score and its contributors"}`, …
+
+**4. "Show me my sleep scores for the last three nights"** →
+`oura_query(collection="daily_sleep", start=…, end=…)`
+
+```json
+{"collection": "daily_sleep", "n": 3, "pages": 1,
+ "data": [{"day": "2026-10-05", "score": 80, "contributors": {…}}, …],
+ "discarded_out_of_range": "3 record(s) from the ±2-day safety margin were trimmed. This is normal and nothing you asked for is missing: …"}
+```
+
+`pages` counts what was followed to the end. The two extra days on each side
+are how the range stays inclusive in every collection, and the response says
+they were trimmed rather than leaving them unexplained.
+
+**5. "Did my sleep get better these last two weeks?"** →
+`oura_compare(metric="daily_sleep.score", a_start=…, a_end=…, b_start=…, b_end=…)`
+
+```json
+{"period_a": {"n": 14, "mean": 76.5}, "period_b": {"n": 14, "mean": 76.5},
+ "difference": 0.0, "noise_band": 2.823, "verdict": "within_noise",
+ "reading": "The difference (0) is inside what this metric does on its own over periods this long (±2.823). It is not evidence of a change — and with these days, a real change smaller than 2.823 would be missed more often than seen."}
+```
+
+**6. "Do my steps affect my sleep the next night?"** →
+`oura_relate(x="daily_activity.steps", y="daily_sleep.score", start=…, end=…, lag=1)`
+
+```json
+{"lag": 1, "pairs": 118, "verdict": "cannot_tell",
+ "reading": "These days give 4.852 effective pairs of day-to-day changes, and at least 20 are needed. …"}
+```
+
+Oura's sample data repeats a short pattern, which leaves fewer than five
+effective pairs in 118 days. Real data usually needs about three months.
+
 ### `oura_compare`: the one calculation, with its method
 
 "Did my HRV go up since I stopped drinking?" is the question people actually
@@ -311,6 +369,11 @@ holds it to that. Today is left out, because it is still accumulating. `sleep`
 uses each day's longest main sleep, and the response states that rule. Asking
 many comparisons and keeping the one that crosses finds a crossing by chance —
 the response says that too.
+
+**Asked whether something is trending**, the server tells the model to compare
+the first half of the window with the second. A dedicated slope test was
+simulated against that and caught only a few points more, and only over 60–90
+days (`tools/trend_study.md`), so there is no trend tool.
 
 ### `oura_relate`: correlation, with the ways it lies taken out
 

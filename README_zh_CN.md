@@ -254,6 +254,62 @@ claude.ai 从 Anthropic 的云端连接连接器，ChatGPT 从 OpenAI 的云端�
 有四分之三落在该指标自身的正常波动范围内，所以一个不带这层背景的百分比
 是在制造信号，而不是在报告信号。它只有一个参数 `days`，取值 1 到 30，默认为 7。
 
+### 示例
+
+每个示例都在 2026 年 10 月 8 日用 Oura 的示例数据（`OURA_SANDBOX=1`）实际运行过。
+响应有删节；沙盒的每个响应还带有 `synthetic`，说明这些数字不是你的。
+
+**1. "它在工作吗？"** → `oura_check`
+
+```json
+{"mode": "sandbox", "data": "synthetic, from Oura, not yours", "oura_responds": true,
+ "unavailable_in_sandbox": ["personal_info"],
+ "next_step": "drop OURA_SANDBOX and set your own credential to see your data"}
+```
+
+**2. "我睡得怎么样，今天状态如何？"** → `oura_today`
+
+昨晚的 `daily_sleep` 和今天的 `daily_readiness`，连同之前 7 天，原样返回。响应里
+写明了这一点：`"computed": "raw records only: this call computed no average,
+no delta and no trend."`
+
+**3. "你能看到我的哪些 Oura 数据？"** → `oura_collections`
+
+全部 19 个集合，每个都写明内容和形态：
+`"daily_sleep": {"shape": "date_range", "carries": "sleep score and its contributors"}`, …
+
+**4. "给我看最近三晚的睡眠分数"** →
+`oura_query(collection="daily_sleep", start=…, end=…)`
+
+```json
+{"collection": "daily_sleep", "n": 3, "pages": 1,
+ "data": [{"day": "2026-10-05", "score": 80, "contributors": {…}}, …],
+ "discarded_out_of_range": "3 record(s) from the ±2-day safety margin were trimmed. This is normal and nothing you asked for is missing: …"}
+```
+
+`pages` 是一直跟到最后的页数。两侧各多取的两天，是让每个集合的范围都包含结束日期
+的办法；响应会说明这些记录被裁掉了，而不是不加解释。
+
+**5. "这两周我的睡眠变好了吗？"** →
+`oura_compare(metric="daily_sleep.score", a_start=…, a_end=…, b_start=…, b_end=…)`
+
+```json
+{"period_a": {"n": 14, "mean": 76.5}, "period_b": {"n": 14, "mean": 76.5},
+ "difference": 0.0, "noise_band": 2.823, "verdict": "within_noise",
+ "reading": "The difference (0) is inside what this metric does on its own over periods this long (±2.823). It is not evidence of a change — and with these days, a real change smaller than 2.823 would be missed more often than seen."}
+```
+
+**6. "我的步数会影响第二天晚上的睡眠吗？"** →
+`oura_relate(x="daily_activity.steps", y="daily_sleep.score", start=…, end=…, lag=1)`
+
+```json
+{"lag": 1, "pairs": 118, "verdict": "cannot_tell",
+ "reading": "These days give 4.852 effective pairs of day-to-day changes, and at least 20 are needed. …"}
+```
+
+Oura 的示例数据重复一个很短的模式，所以 118 天里有效配对不到五个。真实数据通常
+需要大约三个月。
+
 ### `oura_compare`：唯一的计算，连同它的方法
 
 「我戒酒以后 HRV 上去了吗？」才是人们真正带来的问题，而递过去两个平均值会把它答错：
@@ -278,6 +334,10 @@ claude.ai 从 Anthropic 的云端连接连接器，ChatGPT 从 OpenAI 的云端�
 守在这个水平。今天被排除在外，因为它还在累积。`sleep` 取每天最长的那段主睡眠，
 响应会说明这条规则。做很多次比较、只留下越过线的那一次，就会碰巧找到一次越线 ——
 响应也会说明这一点。
+
+**如果问的是某个指标有没有趋势**，服务器会让模型比较时间窗口的前半段和后半段。
+专门的斜率检验和它做过模拟对比，只多检出几个百分点，而且只在 60–90 天的窗口里
+（`tools/trend_study.md`），所以没有趋势工具。
 
 ### `oura_relate`：相关性，去掉了它说谎的那些方式
 

@@ -100,7 +100,8 @@ export const INSTRUCTIONS =
   "verdict. Report them together, read `within_noise` as «not evidence " +
   "of a change or a relation», never as «none», and never report a " +
   "correlation as a cause. Everything else is raw data; no other " +
-  "average, delta or trend comes from here.";
+  "average, delta or trend comes from here: asked whether a metric is " +
+  "trending, run `oura_compare` on the two halves of the window.";
 
 // The connected server, kept so the tool handlers can reach the client.
 let live: McpServer | undefined;
@@ -273,7 +274,10 @@ export function createServer(opts: ServerOptions = {}): McpServer {
       "preceding 120 days, and answers `within_noise`, `outside_noise`, or " +
       "`cannot_tell` when it has too little to know. «within noise» is not " +
       "«no change»: with those days, a real change smaller than `noise_band` " +
-      "is missed more often than seen. Today is left out — it is still accumulating. It says " +
+      "is missed more often than seen. Asked whether a metric is trending, " +
+      "compare the first half of the window with the second. Simulated on the " +
+      "same noise, that catches a steady drift nearly as often as a dedicated " +
+      "slope test. Today is left out — it is still accumulating. It says " +
       "whether the level differs, never why.",
     inputSchema: {
       metric: z.string().describe(

@@ -283,6 +283,64 @@ Cloudflare Worker로 만든 것으로, **당신이 당신의 계정에, 당신�
 들어가므로, 그 맥락 없는 백분율은 신호를 보고하는 것이 아니라 만들어내는
 것입니다. 유일한 파라미터는 `days`이고, 1부터 30까지, 기본값은 7입니다.
 
+### 예시
+
+모두 2026년 10월 8일에 Oura의 샘플 데이터(`OURA_SANDBOX=1`)로 실행했습니다.
+응답은 줄였으며, 샌드박스의 모든 응답에는 숫자가 여러분의 것이 아니라고 알리는
+`synthetic`도 들어 있습니다.
+
+**1. "작동하나요?"** → `oura_check`
+
+```json
+{"mode": "sandbox", "data": "synthetic, from Oura, not yours", "oura_responds": true,
+ "unavailable_in_sandbox": ["personal_info"],
+ "next_step": "drop OURA_SANDBOX and set your own credential to see your data"}
+```
+
+**2. "어젯밤 잘 잤나요? 오늘 컨디션은요?"** → `oura_today`
+
+어젯밤의 `daily_sleep`과 오늘의 `daily_readiness`를 그 전 7일과 함께 가공 없이
+돌려줍니다. 응답이 그렇게 밝힙니다: `"computed": "raw records only: this call
+computed no average, no delta and no trend."`
+
+**3. "내 Oura 데이터에서 무엇을 볼 수 있나요?"** → `oura_collections`
+
+19개 컬렉션 전부와 각각이 담는 내용, 형태:
+`"daily_sleep": {"shape": "date_range", "carries": "sleep score and its contributors"}`, …
+
+**4. "지난 세 밤의 수면 점수를 보여 주세요"** →
+`oura_query(collection="daily_sleep", start=…, end=…)`
+
+```json
+{"collection": "daily_sleep", "n": 3, "pages": 1,
+ "data": [{"day": "2026-10-05", "score": 80, "contributors": {…}}, …],
+ "discarded_out_of_range": "3 record(s) from the ±2-day safety margin were trimmed. This is normal and nothing you asked for is missing: …"}
+```
+
+`pages`는 끝까지 따라간 페이지 수입니다. 양쪽에 붙는 이틀의 여유분은 모든
+컬렉션에서 범위가 끝 날짜를 포함하도록 하는 장치이고, 응답은 그것을 설명 없이
+두지 않고 잘라냈다고 밝힙니다.
+
+**5. "최근 2주 동안 수면이 나아졌나요?"** →
+`oura_compare(metric="daily_sleep.score", a_start=…, a_end=…, b_start=…, b_end=…)`
+
+```json
+{"period_a": {"n": 14, "mean": 76.5}, "period_b": {"n": 14, "mean": 76.5},
+ "difference": 0.0, "noise_band": 2.823, "verdict": "within_noise",
+ "reading": "The difference (0) is inside what this metric does on its own over periods this long (±2.823). It is not evidence of a change — and with these days, a real change smaller than 2.823 would be missed more often than seen."}
+```
+
+**6. "걸음 수가 다음 날 밤 수면에 영향을 주나요?"** →
+`oura_relate(x="daily_activity.steps", y="daily_sleep.score", start=…, end=…, lag=1)`
+
+```json
+{"lag": 1, "pairs": 118, "verdict": "cannot_tell",
+ "reading": "These days give 4.852 effective pairs of day-to-day changes, and at least 20 are needed. …"}
+```
+
+Oura의 샘플 데이터는 짧은 패턴을 반복해서 118일에서 유효 쌍이 다섯 개도 안
+나옵니다. 실제 데이터는 보통 석 달쯤 필요합니다.
+
 ### `oura_compare`: 유일한 계산, 그 방법과 함께
 
 "술을 끊은 뒤로 내 HRV가 올랐나?"는 사람들이 실제로 가져오는 질문이고, 평균 두
@@ -313,6 +371,11 @@ Cloudflare Worker로 만든 것으로, **당신이 당신의 계정에, 당신�
 오늘은 아직 쌓이는 중이므로 제외합니다. `sleep`은 각 날의 가장 긴 주 수면을 쓰고,
 응답이 그 규칙을 밝힙니다. 비교를 여러 번 해서 경계를 넘은 하나만 남기면 우연히
 넘은 것을 찾게 됩니다. 응답은 그것도 말해 줍니다.
+
+**추세를 묻는 질문이면**, 서버는 모델에게 기간의 앞 절반과 뒤 절반을 비교하라고
+안내합니다. 전용 기울기 검정을 그것과 시뮬레이션으로 겨뤄 봤지만 몇 퍼센트포인트 더
+잡았을 뿐이고, 그것도 60–90일에서만이었습니다(`tools/trend_study.md`). 그래서 추세
+도구는 없습니다.
 
 ### `oura_relate`: 상관관계, 그것이 거짓말하는 방식들을 걷어내고
 
