@@ -312,3 +312,7 @@ in more spots than it claimed.
 The repository is in English. It was written in Spanish through 0.2.0; the
 translation and the tool-parameter rename land in 0.3.0, and the rename is a
 breaking change recorded in the CHANGELOG.
+
+## Proceso de problemas
+
+Todos los problemas se gestionan exclusivamente como issues de GitHub, sin importar quién los reporte. Cada problema nuevo debe convertirse en un issue con título descriptivo y etiqueta. No se resuelven por chat ni por correo sin issue.
