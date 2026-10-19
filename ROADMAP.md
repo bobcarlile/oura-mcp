@@ -2779,3 +2779,63 @@ is not a regression. It does say the 5.7% is a measurement, not a ceiling.
 
 The study was built by Codex and rerun here independently, with the same
 result to the last digit.
+
+---
+
+## Re-scan — 18 October 2026
+
+**Usage, measured today:**
+
+| | 8 Oct | 18 Oct |
+|---|---|---|
+| PyPI `mcp-oura`, last month (mirrors included) | 745 | 745 (140 last week) |
+| …of which no OS reported (mirrors, scanners) | — | 72% |
+| `.mcpb` downloads, all releases | 11 | 15 |
+| GitHub page views, 14 days | 8 / 4 uniques | 12 / 10 uniques |
+| GitHub clones, 14 days | 299 / 109 | 256 / 90 |
+| Stars / forks / outside issues | 0 / 0 / 0 | 0 / 0 / 0 |
+| `@daveremy/oura-mcp` on npm, last month | 16,720 | 11,367 |
+
+**And the one that matters more: the author has never used it as an MCP
+tool.** Not configured in Claude Code, Claude Desktop or Codex, and no call
+to any of its tools in any transcript. Real Oura data has gone through
+scripts, never through the server. A directory reviewer with a real account
+would be its first real user, which is backwards. Using it daily with a real
+OAuth grant comes before the submission form — it is also the only way to
+settle the `stress` scope question from 8 October.
+
+**Five new repositories since 8 October**, read from their READMEs, not from
+their code:
+
+- `royreznik/oura-ring-mcp` (npm, 18 Oct): one-click install links for Cursor
+  and VS Code, compact output in hours and km, a whole-day overview tool,
+  OAuth with PKCE and a `0600` token file, sandbox mode. The closest in
+  judgment so far.
+- `mehmetaktug/oura-mcp` (10 Oct): remote, on Cloudflare Workers, with a
+  **Deploy to Cloudflare** button. The same shape as `ts/worker`, with the
+  ten minutes of setup turned into a click. Ships a `weekly_comparison` tool.
+- `Allmight97/oura-mcp` (16 Oct): self-hosted container, two tools
+  (`oura_catalog`, `oura_query`), native JSON, no summaries — the same
+  «hand over data, don't conclude» position, arrived at independently.
+- `lyzetam/mcp-oura` (15 Oct, Python): local, read-only; its README promises
+  «compared with my 30-day average» answers.
+- `soma-intelligence/open-health-sync` (11 Oct, Go): a self-hosted
+  multi-wearable aggregator, «a Terra alternative». With AthleteData (hosted,
+  17 Oura tools) and `davidmosiah`'s nine connectors, aggregation is now the
+  direction the category is moving.
+
+Still no official Oura MCP server or connector. The registry still carries
+about ten Oura servers.
+
+**What changed in the plan:** nothing in the order, everything in the
+urgency. The code is ahead; nobody is using it, its author included.
+
+1. Real use, with a real grant.
+2. The desktop-extension form (`SUBMISSION.md`, ready since September).
+3. npm. **Packing the tarball before the first publish found that the npm
+   install did nothing at all**: `npx` runs the bin through a symlink, the
+   entry point compared file names to decide whether it was the main module,
+   and exited 0 having started nothing. Fixed with a test that fails first,
+   along with the icon, which `files: ["dist"]` would have left out.
+4. Cursor and VS Code install links — after the package exists on npm.
+5. A Deploy button for `ts/worker`, once a real deployment has worked once.

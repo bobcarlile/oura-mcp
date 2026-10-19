@@ -3,18 +3,27 @@
   "version": "0.4.0",
   "description": "The Oura v2 API as an MCP server. Paginates, fixes the date range, warns when data is missing.",
   "license": "MIT",
+  "mcpName": "io.github.proscar87/oura-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/proscar87/oura-mcp.git",
+    "directory": "ts"
+  },
+  "homepage": "https://github.com/proscar87/oura-mcp#readme",
   "type": "module",
   "bin": {
     "oura-mcp": "dist/main.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "icon.png"
   ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsc",
+    "prepublishOnly": "npm run build",
     "test": "vitest run",
     "check": "node dist/main.js --check"
   },

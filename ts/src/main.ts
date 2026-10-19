@@ -11,6 +11,8 @@
  * user sees.
  */
 
+import { realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { OuraError } from "./client.js";
@@ -98,8 +100,20 @@ export async function cli(argv: string[] = process.argv.slice(2)): Promise<numbe
   return 0;
 }
 
-const thisFile = new URL(import.meta.url).pathname;
-if (process.argv[1] && thisFile.endsWith(process.argv[1].replace(/^.*\//, ""))) {
+// Resolved on both sides, never compared by name: npm starts this through
+// `node_modules/.bin/oura-mcp`, a symlink called after the bin and not the
+// file, and a name comparison decided it was not the main module and exited 0
+// having run nothing.
+function isMain(): boolean {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (isMain()) {
   cli().then((c) => { if (c) process.exit(c); }).catch((e) => {
     process.stderr.write(`oura-mcp: ${(e as Error).message}\n`);
     process.exit(1);

@@ -106,6 +106,17 @@ def test_the_readme_keeps_the_ownership_proof():
     assert f"mcp-name: {name}" in readme
 
 
+def test_the_npm_package_keeps_the_ownership_proof():
+    """The npm counterpart of the README line above: the registry reads
+    `mcpName` from the published package.json, and `npm publish` with
+    provenance refuses a `repository` that is not the repository running it."""
+    pkg = _read_json("ts/package.json")
+    assert pkg["mcpName"] == _read_json("server.json")["name"]
+    assert pkg["repository"]["url"] == "git+https://github.com/proscar87/oura-mcp.git"
+    assert pkg["scripts"]["prepublishOnly"] == "npm run build", \
+        "an npm publish would ship whatever ts/dist happens to hold"
+
+
 def test_the_readme_carries_the_privacy_policy():
     """Claude's connectors directory rejects immediately if it's missing or
     incomplete. It has to cover six things.
