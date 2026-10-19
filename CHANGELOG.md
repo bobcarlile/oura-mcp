@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.1 — 19 October 2026
+
+**On npm, as `@proscar87/oura-mcp`.** The TypeScript build — the same code
+the `.mcpb` ships — now installs with `npx -y @proscar87/oura-mcp`.
+
+- **Packing it found that the npm install would have done nothing.** `npx`
+  starts the bin through a symlink named after the bin, and the entry point
+  compared file names to decide whether it was the main module: it decided it
+  was not and exited 0, with no server and no error. Both sides are resolved
+  now, with a test that runs the entry through a symlink. The `.mcpb` and the
+  Docker image start the file by its own path and were never affected.
+- The icon ships inside the npm package.
+- Asked whether a metric is trending, the server instructions and
+  `oura_compare` now say to compare the two halves of the window. A dedicated
+  slope test was simulated and declined: see ROADMAP, «Trends, measured and
+  declined».
+- `publish.yml` publishes to npm by trusted publishing, without a token.
+
 ## 0.4.0 — 27 September 2026
 
 **Two analysis tools, from the repository that said it would never ship one.**
