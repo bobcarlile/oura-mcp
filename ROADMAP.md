@@ -2648,6 +2648,8 @@ the weekly job until someone reads it and updates the file.
 Spec 1.41 was current on the day it was written. One thing in it to watch: the
 webhook data-type enum already lists `meal`, with no `/v2/usercollection/meal`
 route yet. The fingerprint will flag the route the week it appears.
+*(Spec 1.42, seen 19 October: `meal` left the enum again, still with no route.
+Nothing here used it. The fingerprint now records 1.42.)*
 
 Still not covered: the token endpoint's actual response format. That needs a
 real grant, which CI will never have — the `extapi:` prefix was only ever in a

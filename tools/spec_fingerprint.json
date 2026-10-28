@@ -1,5 +1,5 @@
 {
- "version": "openapi-1.41.json",
+ "version": "openapi-1.42.json",
  "paths": {
   "DELETE /v2/webhook/subscription/{id}": [
    "id"
@@ -349,7 +349,6 @@
     "daily_spo2",
     "daily_stress",
     "enhanced_tag",
-    "meal",
     "rest_mode_period",
     "ring_configuration",
     "session",
