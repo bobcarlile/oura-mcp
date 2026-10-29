@@ -17,7 +17,7 @@ const HEADERS = {
   "content-security-policy":
     "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'",
   "x-frame-options": "DENY",
-  "referrer-policy": "no-referrer",
+  "referrer-policy": "strict-origin-when-cross-origin",
 };
 
 const shell = (title: string, body: string) =>
