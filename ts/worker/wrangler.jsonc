@@ -22,9 +22,9 @@
   "vars": {
     // The day Oura keys your records by. REQUIRED: a Worker's clock is UTC,
     // and without this your evening reads as tomorrow. IANA name.
-    "OURA_TIMEZONE": "",
+    "OURA_TIMEZONE": "America/Los_Angeles",
     // "1" serves Oura's sample data and skips the Oura login. For trying the
     // connector before registering an Oura application. Never your data.
-    "OURA_SANDBOX": ""
+    "OURA_SANDBOX": "false"
   }
 }
